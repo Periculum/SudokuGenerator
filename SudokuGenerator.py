@@ -1,10 +1,39 @@
 #!/usr/bin/env python3
 
 import random
+import svgwrite
 
 class Sudoku:
     def __init__(self, board):
         self.board = board
+        
+    def toSVG(self):
+        cell_size = 40
+
+        svg = svgwrite.Drawing('sudoku.svg', size = (9 * cell_size, 9 * cell_size))
+        svg.add(svg.rect(insert = (0, 0), fill = 'white'))
+
+        # Draw the grid lines
+        for i in range(10):
+            line_color = 'black'
+            line_width = 1 if i % 3 == 0 else 0.5
+            # row lines
+            svg.add(svg.line(start = (i * cell_size, 0), end = (i * cell_size, 9 * cell_size),
+                             stroke = line_color, stroke_width = line_width))
+            # column lines
+            svg.add(svg.line(start = (0, i * cell_size), end = (9 * cell_size, i * cell_size),
+                             stroke = line_color, stroke_width = line_width))
+
+        # Draw the numbers
+        for row in range(9):
+            for column in range(9):
+                if self.board[row][column] != 0:
+                    text = svg.text(str(self.board[row][column]), insert = ((column + 0.5) * cell_size,
+                                                                        (row + 0.5) * cell_size),
+                                    font_size = 20, font_family = 'Arial', text_anchor = 'middle', dominant_baseline = 'middle')
+                    svg.add(text)
+
+        svg.save()
 
     def generate(self, difficulty):
         # fill diagonal squares
@@ -106,6 +135,7 @@ def main():
 
     sudoku = Sudoku(board)
     sudoku.generate(3)
+    sudoku.toSVG()
     sudoku.print()
 
 
