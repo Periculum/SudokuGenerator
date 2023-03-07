@@ -16,7 +16,7 @@ class Sudoku:
         # Draw the grid lines
         for i in range(10):
             line_color = 'black'
-            line_width = 1 if i % 3 == 0 else 0.5
+            line_width = 2 if i % 3 == 0 else 0.5
             # row lines
             svg.add(svg.line(start = (i * cell_size, 0), end = (i * cell_size, 9 * cell_size),
                              stroke = line_color, stroke_width = line_width))
