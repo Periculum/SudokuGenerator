@@ -1,41 +1,52 @@
 #!/usr/bin/env python3
 
 import random
-import svgwrite
+import sys
+import time
 
 class Sudoku:
-    def __init__(self, board):
-        self.board = board
-        
-    def toSVG(self):
-        cell_size = 40
+    def __init__(self):
+        self.reset()
 
-        svg = svgwrite.Drawing('sudoku.svg', size = (9 * cell_size, 9 * cell_size))
-        svg.add(svg.rect(insert = (0, 0), fill = 'white'))
+    def reset(self):
+        # create empty 9x9 board
+        rows = 9
+        columns = 9
+        self.board = [[0 for j in range(columns)] for i in range(rows)]
+
+
+    def toSVG(self):
+        # Variables
+        cell_size = 40
+        line_color = "black"
+
+        # creating a rectangle in white with the size of a 9x9-Sudoku
+        svg = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1">'
+        svg += f'<rect x="0" y="0" width="{9 * cell_size}" height="{9 * cell_size}" fill="white" />'
 
         # Draw the grid lines
         for i in range(10):
-            line_color = 'black'
             line_width = 2 if i % 3 == 0 else 0.5
             # row lines
-            svg.add(svg.line(start = (i * cell_size, 0), end = (i * cell_size, 9 * cell_size),
-                             stroke = line_color, stroke_width = line_width))
+            svg += f'<line x1="{i * cell_size}" y1="0"  x2="{i * cell_size}" y2="{9 * cell_size}" \
+                            style="stroke:{line_color}; stroke-width:{line_width}" />'
             # column lines
-            svg.add(svg.line(start = (0, i * cell_size), end = (9 * cell_size, i * cell_size),
-                             stroke = line_color, stroke_width = line_width))
+            svg += f'<line x1="0" y1="{i * cell_size}"  x2="{9 * cell_size}" y2="{i * cell_size}" \
+                            style="stroke:{line_color}; stroke-width:{line_width}" />'
 
         # Draw the numbers
         for row in range(9):
             for column in range(9):
                 if self.board[row][column] != 0:
-                    text = svg.text(str(self.board[row][column]), insert = ((column + 0.5) * cell_size,
-                                                                        (row + 0.5) * cell_size),
-                                    font_size = 20, font_family = 'Arial', text_anchor = 'middle', dominant_baseline = 'middle')
-                    svg.add(text)
+                    svg += f'<text x="{(column + 0.5) * cell_size}" y="{(row + 0.5) * cell_size}" \
+                                    style="font-size:20; text-anchor:middle; dominant-baseline:middle"> {str(self.board[row][column])} </text>'
 
-        svg.save()
+        svg += '</svg>'
+        with open('rectangle.svg', 'w') as f:
+            f.write(svg)
 
-    def generate(self, difficulty):
+
+    def generate(self, difficulty, delay):
         # fill diagonal squares
         for i in range(0, 9, 3):
             square = [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -51,7 +62,7 @@ class Sudoku:
         # difficulty
         empty_cells = self.evaluate(difficulty)
 
-        #remove numbers
+        # remove numbers
         while(empty_cells > 0):
             r, c = random.randint(0, 8), random.randint(0, 8)
             if self.board[r][c] == 0:
@@ -70,25 +81,32 @@ class Sudoku:
                 else:
                     empty_cells -= 1
 
+            if delay <= time.time():
+                print("No Sudoku found. Trying again.")
+                return False
+
+        return True
 
 
     def evaluate(self, difficulty):
-        # 1 = really easy, 3 = hard, 5 = nearly impossible
+        # 1 = really easy, 3 = middle, 6 = devilish (lowest number possible, takes a long time to calculate)
         if difficulty == 1:
-            return 28
+            return 25
         elif difficulty == 2:
-            return 39
+            return 35
         elif difficulty == 3:
-            return 50
+            return 45
         elif difficulty == 4:
-            return 60
+            return 52
         elif difficulty == 5:
-            return 71
+            return 58
+        elif difficulty == 6:
+            return 64
         else:
-            print("Difficulty don't exist")
+            print("invalid difficulty", file=sys.stderr)
 
 
-    # method to print the board
+    # method to print the board in console
     def print(self):
         for i in range(9):
             print(" ".join([str(x)if x != 0 else "." for x in self.board[i]]))
@@ -128,13 +146,26 @@ class Sudoku:
 
 
 def main():
-    # making an empty 9x9 board
-    rows = 9
-    column = 9
-    board = [[0 for j in range(column)] for i in range(rows)]
+    # takes difficulty as an argument, if not provided the program removes half of the board (level 3)
+    args = [int(x) if x.isdecimal() else x for x in sys.argv[1:]]
+    difficulty = args[0] if len(args) > 0 else 3
 
-    sudoku = Sudoku(board)
-    sudoku.generate(3)
+    sudoku = Sudoku()
+
+    # trying in Total for 10 mins to find a sudoku
+    timeout = 600
+    start_time = time.time()
+    end_time = start_time + timeout
+
+    while time.time() < end_time:
+        # if generate() cant find a Sudoku in 20s, it tries again
+        delay = time.time() + 20
+        if sudoku.generate(difficulty, delay) == True:
+            break
+        else:
+            sudoku.reset()
+
+    # printing
     sudoku.toSVG()
     sudoku.print()
 
