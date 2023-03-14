@@ -2,7 +2,10 @@
 
 There are two files:
   * SudokuSolver.py is just a Solver, that finds all possible Solutions to a given Sudoku
-  * SudokuGenerator.py generates Sudoku's with different difficulty levels (1 to 5).
+  * SudokuGenerator.py generates Sudoku's with different difficulty levels (1 to 6). You can pass the difficulty level as an argument. For example:
+  ```
+  python3 SudokuGenerator.py 4
+  ```
   
 ## Copyright
 
