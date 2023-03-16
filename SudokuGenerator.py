@@ -42,7 +42,7 @@ class Sudoku:
                                     style="font-size:20; text-anchor:middle; dominant-baseline:middle"> {str(self.board[row][column])} </text>'
 
         svg += '</svg>'
-        with open('rectangle.svg', 'w') as f:
+        with open('sudoku.svg', 'w') as f:
             f.write(svg)
 
 
