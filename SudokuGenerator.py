@@ -16,7 +16,7 @@ class Sudoku:
         self.board = [[0 for j in range(columns)] for i in range(rows)]
 
 
-    def toSVG(self, difficulty):
+    def toSVG(self):
         # Variables
         cell_size = 40
         line_color = "black"
@@ -43,11 +43,7 @@ class Sudoku:
                                     style="font-size:20; text-anchor:middle; dominant-baseline:middle"> {str(self.board[row][column])} </text>'
 
         svg += '</svg>'
-        # creating the .svg-File with crrent date, time and difficulty
-        now = datetime.now()
-        name = f'sudoku-{now:%Y%m%dT%H%M%S}-{difficulty}.svg'
-        with open(name, 'w') as f:
-            f.write(svg)
+        return svg
 
     def generate(self, difficulty, delay):
         # fill diagonal squares
@@ -159,8 +155,14 @@ def main():
             sudoku.reset()
 
     # printing
-    sudoku.toSVG(difficulty)
     sudoku.print()
+
+    # creating the .svg-File with crrent date, time and difficulty
+    svg = sudoku.toSVG()
+    now = datetime.now()
+    name = f'sudoku-{now:%Y%m%dT%H%M%S}-{difficulty}.svg'
+    with open(name, 'w') as f:
+        f.write(svg)
 
 
 if __name__ == "__main__":
