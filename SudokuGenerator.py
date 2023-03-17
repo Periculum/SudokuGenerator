@@ -3,6 +3,7 @@
 import random
 import sys
 import time
+from datetime import datetime
 
 class Sudoku:
     def __init__(self):
@@ -15,7 +16,7 @@ class Sudoku:
         self.board = [[0 for j in range(columns)] for i in range(rows)]
 
 
-    def toSVG(self):
+    def toSVG(self, difficulty):
         # Variables
         cell_size = 40
         line_color = "black"
@@ -42,9 +43,11 @@ class Sudoku:
                                     style="font-size:20; text-anchor:middle; dominant-baseline:middle"> {str(self.board[row][column])} </text>'
 
         svg += '</svg>'
-        with open('sudoku.svg', 'w') as f:
+        # creating the .svg-File with crrent date, time and difficulty
+        now = datetime.now()
+        name = f'sudoku-{now:%Y%m%dT%H%M%S}-{difficulty}.svg'
+        with open(name, 'w') as f:
             f.write(svg)
-
 
     def generate(self, difficulty, delay):
         # fill diagonal squares
@@ -63,7 +66,7 @@ class Sudoku:
         empty_cells = self.evaluate(difficulty)
 
         # remove numbers
-        while(empty_cells > 0):
+        while empty_cells > 0:
             r, c = random.randint(0, 8), random.randint(0, 8)
             if self.board[r][c] == 0:
                 continue
@@ -90,20 +93,10 @@ class Sudoku:
 
     def evaluate(self, difficulty):
         # 1 = really easy, 3 = middle, 6 = devilish (lowest number possible, takes a long time to calculate)
-        if difficulty == 1:
-            return 25
-        elif difficulty == 2:
-            return 35
-        elif difficulty == 3:
-            return 45
-        elif difficulty == 4:
-            return 52
-        elif difficulty == 5:
-            return 58
-        elif difficulty == 6:
-            return 64
-        else:
+        empty_cells = [0, 25, 35, 45, 52, 58, 64]
+        if difficulty < 1 or difficulty > len(empty_cells)-1:
             print("invalid difficulty", file=sys.stderr)
+        return empty_cells[difficulty]
 
 
     # method to print the board in console
@@ -166,7 +159,7 @@ def main():
             sudoku.reset()
 
     # printing
-    sudoku.toSVG()
+    sudoku.toSVG(difficulty)
     sudoku.print()
 
 
