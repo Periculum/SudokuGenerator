@@ -45,7 +45,7 @@ class Sudoku:
         svg += '</svg>'
         return svg
 
-    def generate(self, difficulty, delay):
+    def generate(self, difficulty, timeout):
         # fill diagonal squares
         for i in range(0, 9, 3):
             square = [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -80,7 +80,7 @@ class Sudoku:
                 else:
                     empty_cells -= 1
 
-            if delay <= time.time():
+            if timeout <= time.time():
                 print("No Sudoku found. Trying again.")
                 return False
 
@@ -142,14 +142,14 @@ def main():
     sudoku = Sudoku()
 
     # trying in Total for 10 mins to find a sudoku
-    timeout = 600
+    delay = 600
     start_time = time.time()
-    end_time = start_time + timeout
+    end_time = start_time + delay
 
     while time.time() < end_time:
         # if generate() cant find a Sudoku in 20s, it tries again
-        delay = time.time() + 20
-        if sudoku.generate(difficulty, delay) == True:
+        timeout = time.time() + 20
+        if sudoku.generate(difficulty, timeout) == True:
             break
         else:
             sudoku.reset()
