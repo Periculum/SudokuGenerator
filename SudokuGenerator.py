@@ -45,7 +45,7 @@ class Sudoku:
         svg += '</svg>'
         return svg
 
-    def generate(self, difficulty, timeout):
+    def generate(self, difficulty):
         # fill diagonal squares
         for i in range(0, 9, 3):
             square = [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -61,9 +61,13 @@ class Sudoku:
         # difficulty
         empty_cells = self.evaluate(difficulty)
 
+        # creating a list of coordinates to visit and shuffeling them
+        unvisited = [(r, c) for r in range(9) for c in range(9)]
+        random.shuffle(unvisited)
+
         # remove numbers
-        while empty_cells > 0:
-            r, c = random.randint(0, 8), random.randint(0, 8)
+        while empty_cells > 0 and len(unvisited) > 0:
+            r, c = unvisited.pop()
             if self.board[r][c] == 0:
                 continue
             else:
@@ -80,11 +84,14 @@ class Sudoku:
                 else:
                     empty_cells -= 1
 
-            if timeout <= time.time():
-                print("No Sudoku found. Trying again.")
-                return False
+        # if unvisited is empty, but empty_cells not -> trying again
+        if empty_cells > 0:
+            print("No Sudoku found. Trying again.")
+            return False
+        else:
+            return True
 
-        return True
+
 
 
     def evaluate(self, difficulty):
@@ -147,9 +154,7 @@ def main():
     end_time = start_time + delay
 
     while time.time() < end_time:
-        # if generate() cant find a Sudoku in 20s, it tries again
-        timeout = time.time() + 20
-        if sudoku.generate(difficulty, timeout) == True:
+        if sudoku.generate(difficulty) == True:
             break
         else:
             sudoku.reset()
