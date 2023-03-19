@@ -67,22 +67,19 @@ class Sudoku:
 
         # remove numbers
         while empty_cells > 0 and len(unvisited) > 0:
+            # saving a copy of the number, just in case, if we cant remove it
             r, c = unvisited.pop()
-            if self.board[r][c] == 0:
-                continue
+            copy = self.board[r][c]
+            self.board[r][c] = 0
+
+            # checking how many solutions are in the board
+            solutions = [solution for solution in self.solve()]
+
+            # if there is more than one solution, we put the number back
+            if len(solutions) > 1:
+                self.board[r][c] = copy
             else:
-                # saving a copy of the number, just in case, if we cant remove it
-                copy = self.board[r][c]
-                self.board[r][c] = 0
-
-                # checking how many solutions are in the board
-                solutions = [solution for solution in self.solve()]
-
-                # if there is more than one solution, we put the number back
-                if len(solutions) > 1:
-                    self.board[r][c] = copy
-                else:
-                    empty_cells -= 1
+                empty_cells -= 1
 
         # if unvisited is empty, but empty_cells not -> trying again
         if empty_cells > 0:
