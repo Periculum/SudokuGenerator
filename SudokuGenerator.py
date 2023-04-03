@@ -134,7 +134,7 @@ class Sudoku:
                             yield from self.solve()
                             # backtrack
                             self.board[r][c] = 0
-                    return False
+                    return
         yield True
 
 
@@ -146,9 +146,9 @@ def main():
     sudoku = Sudoku()
 
     # trying in Total for 10 mins to find a sudoku
-    delay = 600
+    timeout = 600
     start_time = time.time()
-    end_time = start_time + delay
+    end_time = start_time + timeout
 
     while time.time() < end_time:
         if sudoku.generate(difficulty) == True:
