@@ -122,12 +122,16 @@ class Sudoku:
 
 
     def solve(self):
+        # generate random numbers from 1 to 9
+        digits = list(range(1, 10))
+
         # find an empty cell
         for r in range(9):
             for c in range(9):
                 if self.board[r][c] == 0:
-                    # for every empty cell fill a valid number into it
-                    for n in range(1, 10):
+                    # for every empty cell fill a random valid number into it
+                    random.shuffle(digits)
+                    for n in digits:
                         if self.number_is_valid(r, c, n):
                             self.board[r][c] = n
                             # is it solved?
